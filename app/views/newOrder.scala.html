@@ -1,0 +1,147 @@
+@(messages: Messages)
+@views.html.main("Reservando") {
+    @clientNav(messages)
+    @languageSelector(messages)
+    <div class="container" ng-controller="NewOrderCtrl">
+        <div class="row title">
+            <h3>@Messages("client.new.order.new.order.for"): {{restaurant.name}}</h3>
+        </div>
+        <div class="row address">
+            <div class="row"><h5>@Messages("client.new.order.delivery.address")</h5></div>
+            <div class="row">
+                <div class="col s6">
+                    <div class="row">
+                        <div class="col s12" ng-hide="editAddress">
+                            <div class="input-field">
+                                <i class="material-icons prefix" >place</i>
+                                <input type="text" ng-model="orderObject.address.completeAddress" id="currentAddress" class="active" disabled autofocus>
+                                <label for="currentAddress" class="active">@Messages("client.new.order.address")</label>
+                            </div>
+                        </div>
+                        <div class="col s12" ng-hide="editAddress">
+                            <div class="input-field">
+                                <div class="btn btn-large fullBtn" ng-click="toggleEditAddress(true)">@Messages("client.new.order.change.address")</div>
+                            </div>
+                        </div>
+                        <div class="col s12" ng-show="editAddress">
+                            <div class="input-field">
+                                <i class="material-icons prefix" >place</i>
+                                <input type="text" id="address"
+                                ng-model="orderObject.address.completeAddress" vs-google-autocomplete="options"
+                                vs-autocomplete-validator
+                                vs-city="orderObject.address.city" vs-state="orderObject.address.state"
+                                vs-country="orderObject.address.country" vs-district="orderObject.address.district"
+                                vs-latitude="orderObject.address.lat" vs-longitude="orderObject.address.lng">
+                                <label for="address">@Messages("client.new.order.address")</label>
+                            </div>
+                        </div>
+                        <div class="col s12" ng-show="editAddress">
+                            <div class="input-field">
+                                <div class="btn btn-large fullBtn" ng-click="getGeolocateAddress()" >@Messages("client.new.order.geolocate")</div>
+                            </div>
+                        </div>
+                        <div class="col s12" ng-show="editAddress">
+                            <div class="input-field">
+                                <div class="btn btn-large fullBtn" ng-click="toggleEditAddress(false)">@Messages("client.new.order.use.my.address")</div>
+                            </div>
+                        </div>
+                        <div class="col s12" ng-show="editAddress">
+                            <div class="input-field">
+                                <div class="btn btn-large fullBtn" ng-click="changeAddress()">@Messages("client.new.order.confirm")</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s6">
+                    <div class="row">
+                        <ng-map center="[{{coordinates.lat}}, {{coordinates.lng}}]">
+                            <marker position="{{coordinates.lat}}, {{coordinates.lng}}"></marker>
+                        </ng-map>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row menu">
+            <div class="col s7">
+                <div class="row"><h5>@Messages("client.new.order.meals")</h5></div>
+                <div class="row">
+                    <table class="centered highlight">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>@Messages("client.new.order.meal")</th>
+                                <th>@Messages("client.new.order.price")</th>
+                                <th>@Messages("client.new.order.quantity")</th>
+                                <th>@Messages("client.new.order.subtotal")</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr ng-repeat="orderEntry in orderObject.menu">
+                                <td><img ng-src="@routes.Assets.versioned("{{orderEntry.meal.photo.path}}")" alt=""></td>
+                                <td>{{orderEntry.meal.name}}</td>
+                                <td>${{orderEntry.meal.price}}</td>
+                                <td>
+                                    <input type="number" ng-model="orderEntry.amount" min="0">
+                                </td>
+                                <td>${{calculateSubtotal(orderEntry)}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col s5">
+                <div class="row"><h5>@Messages("client.new.order.total.label")</h5></div>
+                <div class="row">
+                    <div class="row">
+                        <div class="col s12">
+                            <h5>@Messages("client.new.order.discount.voucher")</h5>
+                        </div>
+                        <div class="col s12">
+                            <p>
+                                <input name="discount" type="checkbox" id="discount" ng-click="hasDiscount = !hasDiscount"/>
+                                <label for="discount">@Messages("client.new.order.have.a.discount.voucher")</label>
+                            </p>
+                        </div>
+                        <div class="col s6" ng-show="hasDiscount">
+                            <div class="input-field">
+                                <input type="text" ng-model="discCode" id="discountCode" ng-change="resetCode()">
+                                <label for="discountCode">@Messages("client.new.order.discount.code")</label>
+                            </div>
+                        </div>
+                        <div class="col s4" ng-show="hasDiscount && validCode">
+                            <div class="input-field">
+                                <input type="text" ng-model="discount.discount" id="disc" readonly autofocus>
+                                <label for="disc">@Messages("client.new.order.discount")</label>
+                            </div>
+                        </div>
+                        <div class="col s2" ng-show="hasDiscount">
+                            <div class="input-field">
+                                <i class="material-icons prefix send tooltipped" ng-click="checkCode()" ng-show="!invalidCode && !validCode" data-position="right" data-delay="120" data-tooltip="@messages("client.new.order.data-tooltip")">send</i>
+                                <i class="material-icons prefix" ng-show="validCode">check_circle</i>
+                                <i class="material-icons prefix" ng-show="invalidCode">error</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row"><h4>@Messages("client.new.order.total"): {{total | currency}}</h4></div>
+            </div>
+        </div>
+        <div class="row buttons">
+            <div class="col s6 offset-s3" >
+                <div class="btn-large btn fullBtn" ng-click="saveOrder()" ng-show="total != 0">@Messages("client.new.order.make.order")</div>
+                <div class="btn-large btn fullBtn disabled" ng-show="total == 0">@Messages("client.new.order.make.order")</div>
+            </div>
+        </div>
+    </div>
+} {
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/client/newOrder.css")">
+} {
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDM9GdrRT-5ML6OHeHGIIs0zNFjJmOaQUM&libraries=places"></script>
+    <script src="@routes.Assets.versioned("external/vs-google-autocomplete/vs-google-autocomplete.js")"></script>
+    <script src="@routes.Assets.versioned("external/vs-google-autocomplete/vs-autocomplete-validator.js")"></script>
+    <script src="@routes.Assets.versioned("external/ngMap/ng-map.min.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/client/newOrder.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/languageSelector.js")"></script>
+}

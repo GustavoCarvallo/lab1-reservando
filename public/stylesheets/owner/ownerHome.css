@@ -1,0 +1,108 @@
+/*#searchBar{
+    width: 100%;
+}*/
+nav{
+    margin-bottom: 20px;
+}
+
+.inline{
+    display: inline-block;
+}
+
+.btn:hover, .btn-large:hover, .btn-floating:hover{
+    background: #FF9800;
+}
+
+h5{
+    text-align: center;
+    height: 40px;
+}
+td{
+    height:61px;
+}
+
+#addRestaurant{
+    width:100%;
+}
+.add-btn{
+    margin: auto;
+}
+
+.body{
+    height: calc(100vh - 84px);
+}
+
+.body > .row{
+    height: 100%;
+}
+
+.body>.row>*{
+    height: 100%;
+}
+
+.my-restaurant-container, .news-container{
+    height: 80%;
+}
+.empty-msg{
+    width: 100%;
+}
+
+.center-panel{
+    border: 0 solid #BDBDBD;
+    border-left-width: 2px;
+}
+
+.custom-chip {
+    display: inline-block;
+    padding: 0 25px;
+    height: 50px;
+    font-size: 16px;
+    line-height: 50px;
+    border-radius: 25px;
+    background-color: #f1f1f1;
+}
+
+.closebtn {
+    padding-left: 10px;
+    color: #888;
+    font-weight: bold;
+    float: right;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.closebtn:hover {
+    color: #000;
+}
+
+.view, .publish, .unpublish{
+    text-align: center;
+}
+
+.unpublish{
+    transform: rotate(180deg);
+}
+
+.view:hover, .publish:hover, .unpublish:hover{
+    color: red;
+    cursor: pointer;
+}
+
+.row.continues, .row.resOrdButton{
+    text-align: center;
+    margin-top: 20px;
+}
+
+.row.continues .btn{
+    width: 60%;
+    background-color: #FF9800;
+}
+
+.row.resOrdButton .btn {
+    background-color: #FF9800;
+}
+@media only screen and (min-width: 993px) {
+    .container {
+        width: 90%;
+    }
+}

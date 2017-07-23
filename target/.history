@@ -1,0 +1,16 @@
+playVersion
+playversion
+play
+Play
+run
+sbt -jvm-debug 9999 run
+clean
+compile
+clean
+compile
+clean
+compile
+playVersion
+play version
+help
+version

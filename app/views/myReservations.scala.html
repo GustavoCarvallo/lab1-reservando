@@ -1,0 +1,75 @@
+@(messages: Messages)
+@views.html.main("Reservando") {
+    @clientNav(messages)
+    @languageSelector(messages)
+    <div class="container" ng-controller="MyReservationsCtrl">
+        <div class="row title">
+            <h3>@Messages("client.reservations.my.reservations")</h3>
+        </div>
+        <div class="row title" ng-show="reservations.length == 0">
+            <h4>@Messages("client.reservations.no.reservations")</h4>
+        </div>
+        <div class="row" ng-show="reservations.length != 0">
+            <ul class="collapsible popout" data-collapsible="accordion">
+                <li ng-repeat="reservation in reservations | filter: filterByPage">
+                    <div class="collapsible-header" ng-class="{'active': $first}"><i class="material-icons"><i class="material-icons">restaurant</i></i>{{reservation.local.name}}  -  {{getDateTimeFormat(reservation.date)}}<span class="right" ng-show="isExpire(reservation)">@Messages("client.reservations.finished")</span></div>
+                    <div class="collapsible-body container">
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="row"><h5>@Messages("client.reservations.info")</h5></div>
+                                <div class="row">
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td>@Messages("client.reservations.date")</td>
+                                                <td>{{getDate(reservation.date)}}</td>
+                                                <td>@Messages("client.reservations.address")</td>
+                                                <td>{{reservation.local.address.completeAddress}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Messages("client.reservations.hour")</td>
+                                                <td>{{getTime(reservation.date)}}</td>
+                                                <td>@Messages("client.reservations.amount.of.people")</td>
+                                                <td>{{reservation.amount}}</td>
+                                            </tr>
+                                            <tr ng-show="reservation.discount">
+                                                <td>@Messages("client.reservations.discount.code")</td>
+                                                <td>{{reservation.discount.code}} - {{reservation.discount.discount}}%</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row" ng-hide="isExpire(reservation)">
+                                    <div class="col s6"><div class="btn btn-large fullBtn" ng-click="toRestaurant(reservation)">@Messages("client.reservations.view.restaurant")</div></div>
+                                    <div class="col s6"><div class="btn btn-large red fullBtn" ng-click="deleteReservation(reservation, $index)">@Messages("client.reservations.cancel.reservation")</div></div>
+                                </div>
+                                <div class="row" ng-show="isExpire(reservation)">
+                                    <div class="col s6 offset-s3"><div class="btn btn-large fullBtn" ng-click="toRestaurant(reservation)">@Messages("client.reservations.view.restaurant")</div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="row center-align" ng-show="reservations.length != 0">
+            <pagination
+            page="1"
+            page-size="9"
+            total="reservations.length"
+            show-prev-next="true"
+            use-simple-prev-next="false"
+            dots="...."
+            hide-if-empty="true"
+            adjacent="2"
+            scroll-top="false"
+            pagination-action="changePage(page)" />
+        </div>
+    </div>
+} {
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/client/newOrder.css")">
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/client/myOrders.css")">
+} {
+    <script src="@routes.Assets.versioned("javascripts/client/myReservations.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/languageSelector.js")"></script>
+}

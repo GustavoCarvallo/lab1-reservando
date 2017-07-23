@@ -1,0 +1,127 @@
+@(messages: Messages)
+@views.html.main("Reservando") {
+    @clientNav(messages)
+    @languageSelector(messages)
+    <div class="container" ng-controller="NewReservationCtrl">
+        <div class="row title">
+            <h3>@Messages("client.new.reservation.new.reservation.in"): {{restaurant.name}}</h3>
+        </div>
+        <div class="row">
+            <div class="col s6">
+                <div class="row">
+                    <div class="col s12">
+                        <h5>@Messages("client.new.reservation.select.date")</h5>
+                    </div>
+                    <div class="col s12">
+                        <div class="input-field">
+                            <input class="datepicker" type="text" input-date id="selectedDay" ng-model="reservation.date2" ng-change="checkComplete()" disable="disable">
+                            <label for="selectedDay" class="active">@Messages("client.new.reservation.date")</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <h5>@Messages("client.new.reservation.select.time")</h5>
+                    </div>
+                    <div class="col s12">
+                        <div class="timeChip hoverable valign-wrapper waves-effect waves-red waves-ripple z-depth-2" ng-repeat="turn in turns" ng-class="{'selected': $index == selectedTurnIndex, 'z-depth-4': $index == selectedTurnIndex}" ng-click="selectTurn($index)">
+                            <span>{{turn}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <h5>@Messages("client.new.reservation.amount.of.people")</h5>
+                    </div>
+                    <div class="col s12">
+                        <div class="input-field">
+                            <input type="number" name="amount" id="amount" ng-model="reservation.amount"
+                                ng-change="checkComplete()" min="1" max="{{restaurant.capacity}}">
+                            <label for="amount"> @Messages("client.new.reservation.max.amount.of.people"): {{restaurant.capacity}})</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <h5>@Messages("client.new.reservation.discount.voucher")</h5>
+                    </div>
+                    <div class="col s12">
+                        <p>
+                            <input name="discount" type="checkbox" id="discount" ng-click="hasDiscount = !hasDiscount"/>
+                            <label for="discount">@Messages("client.new.reservation.have.a.discount.voucher")</label>
+                        </p>
+                    </div>
+                    <div class="col s6" ng-show="hasDiscount">
+                        <div class="input-field">
+                            <input type="text" ng-model="discCode" id="discountCode" ng-change="resetCode()">
+                            <label for="discountCode">@Messages("client.new.reservation.discount.code")</label>
+                        </div>
+                    </div>
+                    <div class="col s4" ng-show="validCode && hasDiscount">
+                        <div class="input-field">
+                            <input type="text" ng-model="discount.discount" id="disc" readonly>
+                            <label for="disc">@Messages("client.new.reservation.discount")</label>
+                        </div>
+                    </div>
+                    <div class="col s2" ng-show="hasDiscount">
+                        <div class="input-field">
+                            <i class="material-icons prefix send tooltipped" ng-click="checkCode()" ng-show="!invalidCode && !validCode" data-position="right" data-delay="120" data-tooltip="@messages("client.new.reservation.data-tooltip")">send</i>
+                            <i class="material-icons prefix" ng-show="validCode">check_circle</i>
+                            <i class="material-icons prefix" ng-show="invalidCode">error</i>
+                        </div>
+                    </div>
+                </div>
+                <div class="row buttons">
+                    <div class="col s6 offset-s3" >
+                        <div class="btn-large btn fullBtn" ng-click="saveReservation()" ng-show="reservationComplete">@Messages("client.new.reservation.make.reservation")</div>
+                        <div class="btn-large btn fullBtn disabled" ng-hide="reservationComplete">@Messages("client.new.reservation.make.reservation")</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col s6">
+                <div class="row">
+                    <div class="col s12">
+                        <div class="row">
+                            <ng-map center="[{{coordinates.lat}}, {{coordinates.lng}}]">
+                                <marker position="{{coordinates.lat}}, {{coordinates.lng}}"></marker>
+                            </ng-map>
+                        </div>
+                    </div>
+                    <div class="col s12">
+                        <div class="row"><h5>@Messages("client.new.reservation.foods")</h5></div>
+                        <div class="row">
+                            <table class="centered highlight">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>@Messages("client.new.reservation.food")</th>
+                                        <th>@Messages("client.new.reservation.price")</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="meal in menu">
+                                        <td><img ng-src="@routes.Assets.versioned("{{meal.photo.path}}")" alt=""></td>
+                                        <td>{{meal.name}}</td>
+                                        <td>${{meal.price}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+} {
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/client/newReservation.css")">
+} {
+    <script src="@routes.Assets.versioned("javascripts/utils/geocode.js")"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDx5ARsKyUaIV0uBUuCs7M6HxvUOtvcm-E&libraries=places&callback=initAutocomplete"
+    async defer></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-materialize/0.2.2/angular-materialize.min.js"></script>
+    <script src="@routes.Assets.versioned("external/ngMap/ng-map.min.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/client/newReservation.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/languageSelector.js")"></script>
+}

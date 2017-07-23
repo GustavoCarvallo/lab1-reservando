@@ -1,0 +1,10 @@
+[debug] Copy resource mappings: 
+[debug] 	(/Users/Gustavo/Desktop/laboratorio/reservando/conf/application.conf,/Users/Gustavo/Desktop/laboratorio/reservando/target/scala-2.11/classes/application.conf)
+[debug] 	(/Users/Gustavo/Desktop/laboratorio/reservando/conf/evolutions,/Users/Gustavo/Desktop/laboratorio/reservando/target/scala-2.11/classes/evolutions)
+[debug] 	(/Users/Gustavo/Desktop/laboratorio/reservando/conf/logback.xml,/Users/Gustavo/Desktop/laboratorio/reservando/target/scala-2.11/classes/logback.xml)
+[debug] 	(/Users/Gustavo/Desktop/laboratorio/reservando/conf/messages,/Users/Gustavo/Desktop/laboratorio/reservando/target/scala-2.11/classes/messages)
+[debug] 	(/Users/Gustavo/Desktop/laboratorio/reservando/conf/messages.en,/Users/Gustavo/Desktop/laboratorio/reservando/target/scala-2.11/classes/messages.en)
+[debug] 	(/Users/Gustavo/Desktop/laboratorio/reservando/conf/reference.conf,/Users/Gustavo/Desktop/laboratorio/reservando/target/scala-2.11/classes/reference.conf)
+[debug] 	(/Users/Gustavo/Desktop/laboratorio/reservando/conf/routes,/Users/Gustavo/Desktop/laboratorio/reservando/target/scala-2.11/classes/routes)
+[debug] 	(/Users/Gustavo/Desktop/laboratorio/reservando/conf/evolutions/default,/Users/Gustavo/Desktop/laboratorio/reservando/target/scala-2.11/classes/evolutions/default)
+[debug] 	(/Users/Gustavo/Desktop/laboratorio/reservando/conf/evolutions/default/1.sql,/Users/Gustavo/Desktop/laboratorio/reservando/target/scala-2.11/classes/evolutions/default/1.sql)

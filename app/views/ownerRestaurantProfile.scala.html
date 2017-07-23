@@ -1,0 +1,353 @@
+@(messages: Messages)
+@views.html.main("Reservando") {
+    @ownerNav(messages)
+    @languageSelector(messages)
+    <div class="container" ng-controller="RestaurantCtrl">
+        <div class="row image-holder">
+            <img ng-src="@routes.Assets.versioned("{{restaurant.photo.path}}")" alt="" class="materialboxed" width="100%" height="300px" ng-if="photos.length == 0">
+            <img src="{{photos[0].src}}" alt="" class="materialboxed" width="100%" height="300px" ng-if="photos.length > 0">
+            <label for="image-edit" class="btn btn-floating" ng-show="photos.length == 0">
+                <input type="file" ng-file-model="photos" id="image-edit" multiple accept="image/*"><i class="material-icons">edit</i>
+            </label>
+            <div class="btn btn-floating save-photo tooltiped" ng-show="photos.length > 0"
+            ng-click="saveImage()"
+            data-position="left" data-delay="50" data-tooltip="{{photos[0].name}}">
+               <i class="material-icons">save</i>
+            </div>
+            <div class="btn btn-floating cancel-photo" ng-show="photos.length > 0" ng-click="photos = []">
+                <i class="material-icons">cancel</i>
+            </div>
+        </div>
+        <div class="row" ng-hide="editMode">
+            <div class="col s12 info-container">
+                <div class="row title">
+                    <div class="col s7">
+                        <h3>{{restaurant.name}}</h3>
+                        <p ng-show="!totalQualification || totalQualification == -1">@Messages("owner.restaurant.profile.not.rated.yet")</p>
+                        <ng-rate-it ng-model="totalQualification" min="0" max="5" read-only="true" ng-hide="!totalQualification || totalQualification == -1"></ng-rate-it>
+                    </div>
+                    <div class="col s3" ng-hide="restaurant.published">
+                        <div class="btn publish" ng-click="publicateRestaurant(true)">@Messages("owner.restaurant.profile.publish")</div>
+                    </div>
+                    <div class="col s3" ng-show="restaurant.published">
+                        <div class="btn publish" ng-click="publicateRestaurant(false)">@Messages("owner.restaurant.profile.not.publish")</div>
+                    </div>
+                    <div class="col s2">
+                        <div class="btn rigth" ng-click="toggleEditMode(true)">@Messages("owner.restaurant.profile.modify")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s6 info-contanier" ng-hide="editMode">
+                <div class="row">
+                    <p class="address"><i class="material-icons">location_on</i>{{restaurant.address.completeAddress}}</p>
+                </div>
+                <div class="row">
+                    <p class="cuisine"><i class="material-icons">restaurant</i><span ng-repeat="cuisine in restaurant.cuisines">{{ $first ? "" : ","}} {{cuisine.name}}</span></p>
+                </div>
+                <div class="row">
+                    <p class="opening-days" ng-show="restaurant.days.length() == 7"><i class="material-icons">data_range</i> @Messages("owner.restaurant.profile.all.days")</p>
+                    <p class="opening-days" ng-hide="restaurant.days.length() == 7"><i class="material-icons">date_range</i><span ng-repeat="day in restaurant.openingDays">{{$first?"":", "}}{{getTranslateDay(day)}}</span></p>
+                </div>
+                <div class="row">
+                    <p class="opening-time"><i class="material-icons">schedule</i> @Messages("owner.restaurant.profile.from"): {{restaurant.openingHour}} @Messages("owner.restaurant.profile.to"): {{restaurant.closingHour}}</p>
+                </div>
+                <div class="row" ng-hide="restaurant.isLocal">
+                    <p class="opening-time"><i class="material-icons">query_builder</i> @Messages("owner.restaurant.profile.average.delivery.time"): {{restaurant.responseTime}}</p>
+                </div>
+            </div>
+            <div class="col s6 info-container" ng-hide="editMode">
+                <div class="row">
+                    <p>{{restaurant.description}}</p>
+                </div>
+            </div>
+            <div class="col s12 info-container-edit" ng-show="editMode">
+                <div class="row">
+                    <div class="col s8 input-field">
+                        <input type="text" ng-model="restaurantEdit.name" id="name-edit" ng-class="{invalid: errors.name}">
+                        <label for="name-edit">@Messages("owner.restaurant.profile.name")</label>
+                    </div>
+                    <div class="col s2">
+                        <div class="btn" ng-click="toggleEditMode(false)">@Messages("owner.restaurant.profile.cancel")</div>
+                    </div>
+                    <div class="col s2">
+                        <div class="btn" ng-click="restaurantSubmit()">@Messages("owner.restaurant.profile.save")</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input type="text" id="address" class="validate field addressUnique"
+                        ng-model="restaurantEdit.address.completeAddress" vs-google-autocomplete="options"
+                        vs-autocomplete-validator
+                        vs-city="restaurantEdit.address.city" vs-state="restaurantEdit.address.state"
+                        vs-country="restaurantEdit.address.country" vs-district="restaurantEdit.address.district"
+                        vs-latitude="restaurantEdit.address.lat" vs-longitude="restaurantEdit.address.lng"
+                        ng-class="{invalid: errors.address}">
+                        <label for="address">@Messages("owner.restaurant.profile.address")</label>
+                    </div>
+                    <div class="col s2 input-field" ng-hide="restaurantEdit.isLocal">
+                        <input type="number" id="radius-edit" ng-model="restaurantEdit.radius" ng-class="{invalid: errors.radius}">
+                        <label for="radius-edit">@Messages("owner.restaurant.profile.radio")</label>
+                    </div>
+                    <div class="col s4 input-field" ng-hide="restaurantEdit.isLocal">
+                        <input type="number" id="responseTime-edit" ng-model="restaurantEdit.responseTime" ng-class="{invalid: errors.responseTime}">
+                        <label for="responseTime-edit">@Messages("owner.restaurant.profile.average.delivery.time")</label>
+                    </div>
+                    <div class="col s2 input-field" ng-show="restaurantEdit.isLocal">
+                        <input type="number" id="capacity-edit" ng-model="restaurantEdit.capacity" ng-class="{invalid: errors.capacity}">
+                        <label for="capacity-edit">@Messages("owner.restaurant.profile.capacity")</label>
+                    </div>
+                    <div class="col s4 input-field" ng-show="restaurantEdit.isLocal">
+                        <input type="number" id="minsBetweenTurns-edit" ng-model="restaurantEdit.minsBetweenTurns" ng-class="{invalid: errors.minsBetweenTurns}">
+                        <label for="minsBetweenTurns-edit">@Messages("owner.restaurant.profile.time.between.turns")</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12 input-field">
+                        <textarea class="materialize-textarea" type="text" ng-model="restaurantEdit.description" id="descripton-edit" ng-class="{invalid: errors.description}"></textarea>
+                        <label for="descripton-edit">@Messages("owner.restaurant.profile.description")</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <h4>@Messages("owner.new.restaurant.business.days")</h4>
+                    <div class="col" ng-class="{m3: days.selectedDays, m12: !days.selectedDays || days.selectedDays.length == 0}">
+                        <div class="input-field col m12" ng-class="{customInvalid: errors.days}">
+                            <select ng-model="days.selectedDays" material-select multiple watch>
+                                <option value="" disabled selected>@Messages("owner.restaurant.profile.select")</option>
+                                <option ng-repeat="day in days" ng-value="day.day">{{day.day}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col m9" ng-show="days.selectedDays">
+                        <div class="chip" chips ng-repeat="day in days.selectedDays">{{day}}</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <h4>@Messages("owner.restaurant.profile.business.hours")</h4>
+                    <div class="col m6">
+                        <h5>{{restaurant.openingHour}}</h5>
+                    </div>
+                    <div class="col m6">
+                        <h5>{{restaurant.closingHour}}</h5>
+                    </div>
+                    <div class="col m6">
+                        <div class="input-field">
+                            <label for="input_starttime">@Messages("owner.restaurant.profile.from")</label>
+                            <input type="text" id="input_starttime" class="timepicker" input-clock data-twelvehour="false" ng-model="restaurantEdit.startTime" data-default="{{initTime}}" ng-class="{invalid: errors.time}">
+                        </div>
+                    </div>
+                    <div class="col m6">
+                        <div class="input-field">
+                            <label for="input_endtime">@Messages("owner.restaurant.profile.to")</label>
+                            <input type="text" id="input_endtime" class="timepicker" input-clock data-twelvehour="false" ng-model="restaurantEdit.endTime" data-default="{{endTime}}" ng-class="{invalid: errors.time}">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <h4>@Messages("owner.restaurant.profile.type.of.meal")</h4>
+                    <div class="col" ng-class="{m3: cuisines.selectedCuisines, m12: !cuisines.selectedCuisines || cuisines.selectedCuisines.length == 0}">
+                        <div class="input-field col m12" ng-class="{customInvalid: errors.cuisines}">
+                            <select ng-model="cuisines.selectedCuisines" material-select multiple watch >
+                                <option value="" disabled selected>@Messages("owner.restaurant.profile.select")</option>
+                                <option ng-repeat="cuisine in cuisines" ng-value="cuisine.name">{{cuisine.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col m9" ng-show="cuisines.selectedCuisines">
+                        <div class="chip" chips ng-repeat="cuisine in cuisines.selectedCuisines">{{cuisine}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" ng-hide="editMode">
+            <div class="col s6">
+                <div class="row">
+                    <ng-map center="[{{restaurant.address.lat}}, {{restaurant.address.lng}}]">
+                        <marker position="{{restaurant.address.lat}}, {{restaurant.address.lng}}"></marker>
+                    </ng-map>
+                </div>
+            </div>
+            <div class="col s6 menu">
+                <div class="row">
+                    <div class="col s2 offset-s5">
+                        <h5>@Messages("owner.restaurant.profile.menu")</h5>
+                    </div>
+                    <div class="col s1 offset-s4">
+                        <div class="btn-floating accent-color" ng-click="openNewMealModal()"><i class="material-icons">add</i></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <table class="highlight centered responsive-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>@Messages("owner.restaurant.profile.name")</th>
+                                    <th>@Messages("owner.restaurant.profile.edit")</th>
+                                    <th>@Messages("owner.restaurant.profile.delete")</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="meal in menu">
+                                    <td><img ng-src="@routes.Assets.versioned("{{meal.photo.path}}")" class="responsive-img menu-image"></td>
+                                    <td>{{meal.name}}</td>
+                                    <td><i class="material-icons" ng-click="openEditMeal(meal, $index)">edit</i></td>
+                                    <td><i class="material-icons" ng-click="openDeleteMeal($index)">delete</i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row" ng-hide="menu.length > 0">
+                    <p>@Messages("owner.restaurant.profile.menu.not.defined.yet")</p>
+                </div>
+            </div>
+        </div>
+        <div class="row" ng-hide="editMode">
+            <div class="col s4 offset-s4">
+                <div class="btn btn-large red delete waves-effect waves-orange" ng-click="openDelete()">@Messages("owner.restaurant.profile.delete")</div>
+            </div>
+        </div>
+
+            <!-- Delete Modal -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <h4>@Messages("owner.restaurant.profile.delete.restaurant")</h4>
+                <h5>@Messages("owner.restaurant.profile.delete.restaurant.question") <span>{{restaurant.name}}?</span></h5>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-action waves-effect waves-green btn btn-flat" ng-click="deleteRestaurant()">@Messages("owner.restaurant.profile.delete")</div>
+                <div class="modal-action modal-close waves-effect waves-green btn btn-flat">@Messages("owner.restaurant.profile.cancel")</div>
+            </div>
+        </div>
+
+            <!-- New Meal Modal -->
+        <div id="newMealModal" class="modal modal-fixed-footer ">
+            <div class="modal-content">
+                <h4>@Messages("owner.restaurant.profile.add.meal")</h4>
+                <div class="row">
+                    <div class="col s4">
+                        <div class="row">
+                            <div class="img-placeholder" ng-show="newMealPhotos.length == 0">
+                                <img ng-src="/assets/images/placeholder/restaurant.jpg" alt="">
+                            </div>
+                        </div>
+                        <div class="row" ng-if="newMealPhotos.length > 0">
+                            <img ng-src="{{newMealPhotos[0].src}}" alt="">
+                        </div>
+                        <div class="row">
+                            <div class="file-field input-field col s12">
+                                <label class="btn file-select" for="meal-image-input">
+                                    <span>@Messages("owner.restaurant.profile.select.photo")</span>
+                                    <input type="file" multiple ng-file-model="newMealPhotos" accept="image/*" id="meal-image-input">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="image-error" ng-show="newMealErrors.photo">@Messages("owner.restaurant.profile.error.photo.miss")</label>
+                            <label class="image-error" ng-show="newMealErrors.photoSize">@Messages("owner.restaurant.profile.error.photo.size")</label>
+                        </div>
+                    </div>
+                    <div class="col s8">
+                        <div class="row">
+                            <div class="col s12 input-field">
+                                <input type="text" ng-model="newMeal.name" id="newMealName" ng-class="{invalid: newMealErrors.name}">
+                                <label for="newMealName">@Messages("owner.restaurant.profile.name")</label>
+                            </div>
+                            <div class="col s12 input-field">
+                                <input type="number"min="0" ng-model="newMeal.price" id="newMealPrice" ng-class="{customInvalid: newMealErrors.price}">
+                                <label for="newMealPrice">@Messages("owner.restaurant.profile.price")</label>
+                            </div>
+                            <div class="col s12 input-field">
+                                <textarea class="materialize-textarea" ng-model="newMeal.description" id="newMealDescription" ng-class="{invalid: newMealErrors.description}"></textarea>
+                                <label for="newMealDescription">@Messages("owner.restaurant.profile.description")</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-action waves-effect waves-green btn btn-flat" ng-click="saveNewMeal()">@Messages("owner.restaurant.profile.save")</div>
+                <div class="modal-action modal-close waves-effect waves-green btn btn-flat">@Messages("owner.restaurant.profile.cancel")</div>
+            </div>
+        </div>
+
+            <!-- Edit Meal Modal -->
+        <div id="editMealModal" class="modal modal-fixed-footer ">
+            <div class="modal-content">
+                <h4>@Messages("owner.restaurant.profile.edit.meal")</h4>
+                <div class="row">
+                    <div class="col s4">
+                        <div class="row">
+                            <div class="img-placeholder" ng-show="editMealPhotos.length == 0">
+                                <img ng-src="@routes.Assets.versioned("{{editMeal.photo.path}}")" class="responsive-img edit-meal-image">
+                            </div>
+                        </div>
+                        <div class="row" ng-if="editMealPhotos.length > 0">
+                            <img ng-src="{{editMealPhotos[0].src}}" alt="" class="responsive-img edit-meal-image">
+                        </div>
+                        <div class="row">
+                            <div class="file-field input-field col s12">
+                                <label class="btn file-select" for="edit-meal-image-input">
+                                    <span>@Messages("owner.restaurant.profile.select.photo")</span>
+                                    <input type="file" multiple ng-file-model="editMealPhotos" accept="image/*" id="edit-meal-image-input">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="image-error" ng-show="newMealErrors.photo">@Messages("owner.restaurant.profile.error.photo.miss")</label>
+                            <label class="image-error" ng-show="newMealErrors.photoSize">@Messages("owner.restaurant.profile.error.photo.size")</label>
+                        </div>
+                    </div>
+                    <div class="col s8">
+                        <div class="row">
+                            <div class="col s12 input-field">
+                                <input type="text" ng-model="editMeal.name" id="editMealName" ng-class="{invalid: editMealErrors.name}">
+                                <label for="editMealName">@Messages("owner.restaurant.profile.name")</label>
+                            </div>
+                            <div class="col s12 input-field">
+                                <input type="number"min="0" ng-model="editMeal.price" id="editMealPrice" ng-class="{customInvalid: editMealErrors.price}">
+                                <label for="editMealPrice">@Messages("owner.restaurant.profile.price")</label>
+                            </div>
+                            <div class="col s12 input-field">
+                                <textarea class="materialize-textarea" ng-model="editMeal.description" id="editMealDescription" ng-class="{invalid: editMealErrors.description}"></textarea>
+                                <label for="editMealDescription">@Messages("owner.restaurant.profile.description")</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-action waves-effect waves-green btn btn-flat" ng-click="saveEditMeal()">@Messages("owner.restaurant.profile.save")</div>
+                <div class="modal-action modal-close waves-effect waves-green btn btn-flat">@Messages("owner.restaurant.profile.cancel")</div>
+            </div>
+        </div>
+
+            <!-- Delete Meal Modal -->
+        <div id="deleteMealModal" class="modal">
+            <div class="modal-content">
+                <h4>@Messages("owner.restaurant.profile.delete.meal")</h4>
+                <h5>@Messages("owner.restaurant.profile.delete.meal.question") <span>{{mealToDelete.name}}?</span></h5>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-action waves-effect waves-green btn btn-flat" ng-click="deleteMeal()">@Messages("owner.restaurant.profile.delete")</div>
+                <div class="modal-action modal-close waves-effect waves-green btn btn-flat">@Messages("owner.restaurant.profile.cancel")</div>
+            </div>
+        </div>
+    </div>
+} {
+    <link rel="stylesheet" href="@routes.Assets.versioned("external/angular-rateit-master/src/style/ng-rateit.css")">
+    @*<link rel="stylesheet" href="@routes.Assets.versioned("external/materialize-clockpicker/dist/css/materialize.clockpicker.css")">*@
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/owner/restaurant.css")">
+} {
+    <script src="@routes.Assets.versioned("external/angular-rateit-master/src/ng-rateit.js")"></script>
+    @*<script src="@routes.Assets.versioned("external/materialize-clockpicker/dist/js/materialize.clockpicker.js")"></script>*@
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDM9GdrRT-5ML6OHeHGIIs0zNFjJmOaQUM&libraries=places"></script>
+    <script src="@routes.Assets.versioned("external/vs-google-autocomplete/vs-google-autocomplete.js")"></script>
+    <script src="@routes.Assets.versioned("external/vs-google-autocomplete/vs-autocomplete-validator.js")"></script>
+    <script src="@routes.Assets.versioned("external/ngMap/ng-map.min.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/owner/restaurant.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/languageSelector.js")"></script>
+}

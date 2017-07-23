@@ -1,0 +1,76 @@
+#loginbody{
+    background: url(/assets/images/placeholder/login.jpg) no-repeat center center;
+    background-size: cover;
+    height: 100vh;
+}
+#loginbody .bg-overlay {
+    background-color: rgba(0, 0, 0, .35);
+    height: 100%;
+}
+.title{
+    color: whitesmoke;
+    padding: 15px;
+    border-radius: 5px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.input-field.suffix i {
+    position: absolute;
+    width: 3rem;
+    font-size: 2rem;
+    transition: color .2s;
+    top: 0px;
+    right: 0px;
+}
+
+.input-field.suffix i.active {
+    color: #26a69a;
+}
+
+.input-field.suffix input,
+.input-field.suffix textarea {
+    margin-right: 3rem;
+    width: 92%;
+    width: calc(100% - 3rem);
+}
+
+.input-field.suffix textarea {
+    padding-top: .8rem;
+}
+
+.input-field.suffix label {
+    margin-right: 3rem;
+}
+
+.full-height{
+    height: 100%;
+    margin-top: 20px;
+}
+
+.login-section{
+    background-color: rgba(245, 245, 245, 0.95);
+    padding-bottom: 10px;
+}
+
+.navbar {
+    background-color: #b71818;
+}
+
+.navbar .input-field input {
+    border-bottom: 1px solid #E1E1E1;
+    color: white !important;
+}
+
+.navbar .input-field input:focus {
+    border-bottom: 1px solid whitesmoke !important;
+}
+
+.navbar .input-field label, .navbar .input-field label.active {
+    color: #E1E1E1 !important;
+}
+
+.navbar .btn.right {
+    margin-top: 10px;
+}

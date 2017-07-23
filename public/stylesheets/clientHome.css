@@ -1,0 +1,37 @@
+ng-map{
+    height: 350px;
+}
+
+.search-container{
+    border-radius: 2.5px;
+    margin-top: 50px;
+}
+
+.big-btn{
+    width: 100%;
+}
+
+.sidebar{
+    opacity: 100;
+    transition: all linear 0.5s;
+    width: 200px;
+    position: fixed;
+    left: 0;
+    height: 90vh;
+}
+.ng-hide-remove{
+    opacity: 0;
+}
+
+.switch-list{
+    cursor: pointer;
+}
+.switch-list:hover{
+    color: red;
+}
+
+.customImage{
+    max-height: 220px;
+    min-height: 220px;
+    height: 220px;
+}

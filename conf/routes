@@ -1,0 +1,103 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# An example controller showing a sample clientHome page
+GET     /                           controllers.HomeController.index
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+POST    /register                   controllers.RegisterController.registerUser
+
+POST    /login                      controllers.LoginController.login
+GET     /logout                     controllers.LoginController.logout
+
+#Client
+GET     /client/home                            controllers.HomeController.clientHome
+#GET     /client/profile                         controllers.ClientProfileController.clientProfile
+GET     /client/profile                         controllers.HomeController.clientProfile
+GET     /client/profile/user                    controllers.ClientProfileController.getClient
+GET     /client/restaurant                      controllers.HomeController.clientRestaurant
+GET     /client/searchAllRestaurants            controllers.ClientHomeController.searchAllRestaurants
+POST    /client/deleteAccount                   controllers.ClientProfileController.deleteAccount
+POST    /client/search                          controllers.ClientHomeController.search
+POST    /client/getRecommendations              controllers.ClientHomeController.getRecommendations
+
+#Restaurant
+POST    /restaurant                                 controllers.RestaurantController.addRestaurant
+GET     /restaurants/all                            controllers.RestaurantController.getAll
+GET     /restaurants/firsts                         controllers.RestaurantController.getFirsts
+GET     /restaurants/of-owner                       controllers.RestaurantController.getRestaurantsFromOwner()
+GET     /restaurant/:rid                            controllers.RestaurantController.getRestaurant(rid: String)
+POST    /restaurant/state/:rid                      controllers.RestaurantController.changeState(rid: String)
+PUT     /restaurant/:rid                            controllers.RestaurantController.update(rid: String)
+PUT     /restaurant/:rid/photo                      controllers.RestaurantController.updatePhoto(rid: String)
+DELETE  /restaurant/:rid                            controllers.RestaurantController.delete(rid: String)
+GET     /restaurants/nearMe/:lat/:lng           controllers.RestaurantController.searchNearMe(lat: String, lng: String)
+
+#Meal
+GET     /menu/:rid                  controllers.MealController.getMenu(rid: String)
+POST    /meal/:rid                  controllers.MealController.newMeal(rid: String)
+PUT     /meal/:mid                  controllers.MealController.update(mid: String)
+DELETE  /meal/:mid                  controllers.MealController.delete(mid: String)
+
+#Owner
+GET     /owner/home                 controllers.HomeController.ownerHome
+GET     /owner/new-restaurant       controllers.HomeController.newRestaurant
+GET     /owner/profile              controllers.HomeController.ownerProfile
+GET     /owner/restaurant           controllers.HomeController.ownerRestaurant
+GET     /owner/restaurants          controllers.HomeController.ownerRestaurants
+GET     /owner/profile/user         controllers.OwnerProfileController.getOwner
+POST    /owner/deleteAccount        controllers.OwnerProfileController.deleteAccount
+
+#User
+PUT     /user/photo                 controllers.UserController.changePhoto
+PUT     /user/info                  controllers.UserController.changeInfo
+PUT     /user/password              controllers.UserController.changePassword
+
+GET     /all/days                   controllers.HomeController.getDays
+GET     /all/cuisines               controllers.HomeController.getCuisines
+
+#Qualification
+GET     /qualification/client/:rid    controllers.QualificationController.getUserRestaurantQualification(rid: String)
+GET     /qualification/:rid         controllers.QualificationController.getRestaurantQualification(rid: String)
+PUT     /qualification              controllers.QualificationController.addQualification
+
+#Order
+GET     /order                      controllers.OrderController.view
+GET     /owner/my-orders            controllers.OrderController.ownerOrdersView
+GET     /my-orders                  controllers.OrderController.myOrdersView
+GET     /orders/client              controllers.OrderController.getClientOrders
+GET     /orders/owner               controllers.OrderController.getOwnerOrders
+GET     /orders/owner/firsts        controllers.OrderController.getOwnerFirsts
+GET     /order/:oId                 controllers.OrderController.getOrder(oId: String)
+POST    /order                      controllers.OrderController.newOrder
+
+#Reservation
+GET     /reservation                controllers.ReservationController.view
+GET     /reservation/client         controllers.ReservationController.getClientReservations
+GET     /reservation/owner          controllers.ReservationController.getOwnerReservations
+GET     /reservation/owner/firsts   controllers.ReservationController.getOwnerFirsts
+GET     /reservation/owner/firsts   controllers.ReservationController.getOwnerFirsts
+GET     /my-reservations            controllers.ReservationController.viewClientReservations
+GET     /owner/my-reservations      controllers.ReservationController.viewOwnerReservations
+GET     /reservation/:rId           controllers.ReservationController.getReservation(rId: String)
+POST    /reservation                controllers.ReservationController.save
+DELETE  /reservation/:id            controllers.ReservationController.delete(id: String)
+
+#Discount
+GET     /discount/:code             controllers.DiscountController.getDiscount(code: String)
+
+#Debug
+GET     /all/users                  controllers.DebugController.getUsers
+GET     /all/restaurants            controllers.DebugController.getRestaurants
+GET     /all/days                   controllers.DebugController.getDays
+GET     /all/cuisines               controllers.DebugController.getCuisines
+GET     /all/meals                  controllers.DebugController.getMeals
+
+#Messages (I18N)
+GET     /messages.js                controllers.MessageController.messages()
+GET     /language                   controllers.MessageController.getCurrentLang
+POST    /language/change            controllers.MessageController.changeLang
